@@ -1,3 +1,4 @@
+// Package input для пользовательского ввода
 package input
 
 import (

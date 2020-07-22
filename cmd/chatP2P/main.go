@@ -12,12 +12,15 @@ import (
 )
 
 func init() {
+	// Проверка указан ли IP:pport для запуска
+	os.Exit(0)
 	if len(os.Args) != 2 {
 		panic("Incorect cmd args run")
 	}
 }
 
 func main() {
+	// пример простого запуска
 	network.NewNode(os.Args[1]).Run(handleServer, handleClient)
 }
 

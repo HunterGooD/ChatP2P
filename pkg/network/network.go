@@ -1,3 +1,4 @@
+// Package network для создания узлов передачи данных между ними
 package network
 
 import (
