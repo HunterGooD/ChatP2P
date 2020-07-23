@@ -13,7 +13,6 @@ import (
 
 func init() {
 	// Проверка указан ли IP:pport для запуска
-	os.Exit(0)
 	if len(os.Args) != 2 {
 		panic("Incorect cmd args run")
 	}

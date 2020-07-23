@@ -1,9 +1,10 @@
 // Package output Для различного вывода информации
 package output
 
+// начало конец
 const (
-	prefix  = "\033["
-	postfix = "m"
+	BEGIN = "\033["
+	END   = "m"
 )
 
 // Формат текст
