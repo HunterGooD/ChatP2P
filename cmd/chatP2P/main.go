@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/huntergood/ChatP2P/pkg/network"
+	"github.com/huntergood/ChatP2P/pkg/output"
 	"github.com/huntergood/chatP2P/pkg/input"
 )
 
@@ -41,11 +42,11 @@ func handleConnection(node *network.Node, conn net.Conn) {
 		return
 	}
 	if resPackage.Data == network.DisconnectBytes {
-		node.Disconnect([]string{resPackage.From}, false)
+		node.Disconnect([]string{resPackage.From.Addr}, false)
 		return
 	}
-	node.ConnectTo([]string{resPackage.From})
-	fmt.Println(resPackage.Data)
+	node.ConnectTo([]string{resPackage.From.Addr})
+	output.OPrintln(resPackage.From.Addr, resPackage.Data, resPackage.From.Color)
 }
 
 func handleServer(node *network.Node) {
@@ -86,6 +87,9 @@ func handleClient(node *network.Node) {
 
 		case "/network":
 			node.GetNetwork()
+
+		case "/change-color":
+			fmt.Println("Потом")
 
 		default:
 			node.SendMessageAll(message)

@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"net"
 	"strings"
+
+	"github.com/huntergood/ChatP2P/pkg/output"
 )
 
 // DisconnectBytes строка отправляющая сигнал об отключении пользователя
@@ -15,6 +17,7 @@ const DisconnectBytes = "\001\002\003\004\003\002\001"
 type Node struct {
 	Connections map[string]bool
 	Address     Address
+	Color       *output.Color
 }
 
 // Address /
@@ -27,14 +30,22 @@ type Address struct {
 // Package передача данных
 type Package struct {
 	To   string
-	From string
+	From *User
 	Data string
+}
+
+// User пользователь цвет и адрес
+type User struct {
+	Color *output.Color
+	Addr  string
 }
 
 // NewNode возвращает созданый узел
 // address ip:port
 func NewNode(address string) *Node {
 	splitAddr := strings.Split(address, ":")
+	color := &output.Color{}
+	color.RandText()
 
 	// Если не передан порт возвращаем nil
 	if len(splitAddr) != 2 {
@@ -46,6 +57,7 @@ func NewNode(address string) *Node {
 			IP:   splitAddr[0],
 			Port: ":" + splitAddr[1],
 		},
+		Color: color,
 	}
 }
 
@@ -70,7 +82,10 @@ func (n *Node) ConnectTo(addresses []string) {
 // Disconnect отключает соединения
 func (n *Node) Disconnect(addresses []string, ok bool) {
 	var p = &Package{
-		From: n.MyAddress(),
+		From: &User{
+			Color: n.Color,
+			Addr:  n.MyAddress(),
+		},
 		Data: DisconnectBytes,
 	}
 	for _, addr := range addresses {
@@ -97,7 +112,10 @@ func (n *Node) GetNetwork() {
 // SendMessageAll Отправляет сообщение всем пользователям
 func (n *Node) SendMessageAll(message string) {
 	var newPackage *Package = &Package{
-		From: n.MyAddress(),
+		From: &User{
+			Color: n.Color,
+			Addr:  n.MyAddress(),
+		},
 		Data: message,
 	}
 	for addr := range n.Connections {
