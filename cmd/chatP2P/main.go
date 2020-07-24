@@ -40,6 +40,10 @@ func handleConnection(node *network.Node, conn net.Conn) {
 	if err := json.Unmarshal([]byte(message), &resPackage); err != nil {
 		return
 	}
+	if resPackage.Data == network.DisconnectBytes {
+		node.Disconnect([]string{resPackage.From}, false)
+		return
+	}
 	node.ConnectTo([]string{resPackage.From})
 	fmt.Println(resPackage.Data)
 }
@@ -72,6 +76,13 @@ func handleClient(node *network.Node) {
 
 		case "/connect":
 			node.ConnectTo(splitMessage[1:])
+
+		case "/disconnect":
+			if len(splitMessage) > 1 {
+				node.Disconnect(splitMessage[1:], true)
+				break
+			}
+			fmt.Println("Error Param")
 
 		case "/network":
 			node.GetNetwork()

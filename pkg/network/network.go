@@ -8,6 +8,9 @@ import (
 	"strings"
 )
 
+// DisconnectBytes строка отправляющая сигнал об отключении пользователя
+const DisconnectBytes = "\001\002\003\004\003\002\001"
+
 // Node /
 type Node struct {
 	Connections map[string]bool
@@ -52,11 +55,30 @@ func (n *Node) Run(handleServer func(*Node), handleClient func(*Node)) {
 	handleClient(n)
 }
 
-// ConnectTo Присоединяет пользователя к какому либо пользователю
+// ConnectTo Присоединяет пользователей к какому либо пользователю
 func (n *Node) ConnectTo(addresses []string) {
 	// TODO: Генерация сеансового ключа и передача
 	for _, addr := range addresses {
+		splitAddr := strings.Split(addr, ":")
+		if _, ok := n.Connections[":"+splitAddr[1]]; ok {
+			delete(n.Connections, ":"+splitAddr[1])
+		}
 		n.Connections[addr] = true
+	}
+}
+
+// Disconnect отключает соединения
+func (n *Node) Disconnect(addresses []string, ok bool) {
+	var p = &Package{
+		From: n.MyAddress(),
+		Data: DisconnectBytes,
+	}
+	for _, addr := range addresses {
+		if ok {
+			p.To = addr
+			n.Send(p)
+		}
+		delete(n.Connections, addr)
 	}
 }
 
